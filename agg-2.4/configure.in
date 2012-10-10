@@ -121,8 +121,6 @@ if test "$no_x" = "yes"; then
   AC_MSG_WARN([*** X11 not found! Omitting X11 layer.])
 fi
 
-echo " ***************** "$x_includes
-
 AM_CONDITIONAL(ENABLE_X11,[test x$no_x = x -a xno != x$enable_platform -a x$win32_host != xyes])
 AC_SUBST(x_includes)
 AC_SUBST(x_libraries)
