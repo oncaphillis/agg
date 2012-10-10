@@ -30,7 +30,7 @@ agginclude_HEADERS = \
 	agg_conv_gpc.h               agg_renderer_markers.h \
 	agg_conv_marker.h            agg_renderer_mclip.h            agg_trans_perspective.h \
 	agg_conv_marker_adaptor.h    agg_renderer_outline_aa.h       agg_trans_single_path.h \
-	agg_conv_segmentator.h       agg_renderer_outline_image.h    agg_trans_viewport.h \
+        agg_conv_segmentator.h       agg_renderer_outline_image.h    agg_trans_viewport.h \
 	agg_conv_shorten_path.h      agg_renderer_primitives.h       agg_trans_warp_magnifier.h \
 	agg_conv_smooth_poly1.h      agg_renderer_raster_text.h      agg_vcgen_bspline.h \
 	agg_conv_stroke.h            agg_renderer_scanline.h         agg_vcgen_contour.h \
@@ -44,4 +44,5 @@ agginclude_HEADERS = \
 	agg_embedded_raster_fonts.h  agg_scanline_storage_bin.h      agg_vpgen_clip_polyline.h \
 	agg_font_cache_manager.h     agg_scanline_u.h                agg_vpgen_segmentator.h \
 	agg_gamma_functions.h        agg_shorten_path.h \
-	agg_gamma_lut.h              agg_simul_eq.h
+	agg_gamma_lut.h              agg_simul_eq.h \
+        agg_rasterizer_scanline_aa_nogamma.h
