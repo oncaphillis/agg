@@ -45,4 +45,5 @@ agginclude_HEADERS = \
 	agg_font_cache_manager.h     agg_scanline_u.h                agg_vpgen_segmentator.h \
 	agg_gamma_functions.h        agg_shorten_path.h \
 	agg_gamma_lut.h              agg_simul_eq.h \
-        agg_rasterizer_scanline_aa_nogamma.h
+        agg_rasterizer_scanline_aa_nogamma.h \
+        agg_color_cmyka.h agg_pixfmt_cmyk.h
