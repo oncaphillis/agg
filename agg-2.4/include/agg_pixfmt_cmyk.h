@@ -26,7 +26,7 @@
 
 #include <string.h>
 #include "agg_basics.h"
-#include "agg_color_cmyk.h"
+#include "agg_color_cmyka.h"
 #include "agg_rendering_buffer.h"
 
 namespace agg
