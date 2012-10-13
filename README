@@ -3,7 +3,7 @@ Yet   another   clone     of    the  Antigrain     Geometry    library
 hi-quality  graphics library without  any central maintainer (?). This
 clone is based on https://agg.svn.sourceforge.net/svnroot/agg.
 
-It us menat to serve as the  backend for my  poppler-agg prohect to be
+It is meant to serve as the  backend for my  poppler-agg project to be
 found under:
 
  https://github.com/oncaphillis/poppler-agg.git
@@ -12,5 +12,3 @@ Changes for now
 
  * made some operators for agg::trans_affine const
  * added agg_color_cmyka and agg_pixfmt_cmyk
-
-
