@@ -1,7 +1,10 @@
 PROJECT( antigrain )
 
+SET(CMAKE_C_FLAGS "-fPIC ${CMAKE_CFLAGS}")
+
 # additional are modified Find routines
 SET ( CMAKE_MODULE_PATH "${antigrain_SOURCE_DIR}/bin" )
+# SET( CMAKE_CXX_FLAGS "-fPIC -shared ${CMAKE_CXX_FLAGS}")
 
 CMAKE_MINIMUM_REQUIRED( VERSION 2.4.8 )
 
