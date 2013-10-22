@@ -127,6 +127,8 @@ SET( antigrain_HEADERS
 
     ${antigrain_SOURCE_DIR}/include/agg_span_gradient_contour.h
     ${antigrain_SOURCE_DIR}/include/agg_span_gradient_image.h
+
+    ${antigrain_SOURCE_DIR}/include/agg_rasterizer_scanline_aa_nogamma.h 
 )
 
 ADD_LIBRARY( antigrain
