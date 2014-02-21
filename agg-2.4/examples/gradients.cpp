@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+
 #include "agg_rendering_buffer.h"
 #include "agg_rasterizer_scanline_aa.h"
 #include "agg_scanline_u.h"
@@ -34,12 +36,50 @@ const double center_x = 350;
 const double center_y = 280;
 
 
-
-
 class gradient_polymorphic_wrapper_base
 {
 public:
     virtual int calculate(int x, int y, int) const = 0;
+};
+
+namespace agg {
+    class gradient_radial_2
+    {
+    public:
+        gradient_radial_2()
+            : m_x(0),
+              m_y(0),
+              i_x(0),
+              i_y(0),
+              m_init(false)
+        {
+        }
+        ~gradient_radial_2()
+        {
+            std::cerr << __PRETTY_FUNCTION__ << " @ X:" << i_x << ";" << m_x << " " << ((::abs(m_x-i_x))>>4)
+                      << " Y:" << i_y << ";" << m_y << " " << ((::abs(m_y-i_y))>>4)<<std::endl;
+        }
+
+        virtual int calculate(int x,int y,int d) const
+        {
+            gradient_radial_2 *p = const_cast<gradient_radial_2 *>(this);
+
+            p->m_x = !m_init || p->m_x<x ? x : p->m_x;
+            p->m_y = !m_init || p->m_y<y ? y : p->m_y;
+            p->i_x = !m_init || p->i_x>x ? x : p->i_x;
+            p->i_y = !m_init || p->i_y>y ? y : p->i_y;
+
+            p->m_init = true;
+            
+            return d;
+        }
+        int m_x;
+        int m_y;
+        int i_x;
+        int i_y;
+
+        bool m_init;
+    };
 };
 
 template<class GradientF> 
@@ -329,6 +369,7 @@ public:
         typedef agg::renderer_base<pixfmt> renderer_base;
         agg::scanline_u8 sl;
 
+
         pixfmt pixf(rbuf_window());
         renderer_base rb(pixf);
         rb.clear(agg::rgba(0, 0, 0));
@@ -345,21 +386,27 @@ public:
         double ini_scale = 1.0;
 
         agg::trans_affine mtx1;
+
         mtx1 *= agg::trans_affine_scaling(ini_scale, ini_scale);
         mtx1 *= agg::trans_affine_rotation(agg::deg2rad(0.0));
         mtx1 *= agg::trans_affine_translation(center_x, center_y);
         mtx1 *= trans_affine_resizing();
 
+
         agg::ellipse e1;
         e1.init(0.0, 0.0, 110.0, 110.0, 64);
 
         agg::trans_affine mtx_g1;
+
+
         mtx_g1 *= agg::trans_affine_scaling(ini_scale, ini_scale);
         mtx_g1 *= agg::trans_affine_scaling(m_scale, m_scale);
         mtx_g1 *= agg::trans_affine_scaling(m_scale_x, m_scale_y);
         mtx_g1 *= agg::trans_affine_rotation(m_angle);
         mtx_g1 *= agg::trans_affine_translation(m_center_x, m_center_y);
         mtx_g1 *= trans_affine_resizing();
+
+
         mtx_g1.invert();
 
 
@@ -375,7 +422,7 @@ public:
 
         agg::conv_transform<agg::ellipse, agg::trans_affine> t1(e1, mtx1);
 
-        gradient_polymorphic_wrapper<agg::gradient_radial>       gr_circle;
+        gradient_polymorphic_wrapper<agg::gradient_radial_2>       gr_circle;
         gradient_polymorphic_wrapper<agg::gradient_diamond>      gr_diamond;
         gradient_polymorphic_wrapper<agg::gradient_x>            gr_x;
         gradient_polymorphic_wrapper<agg::gradient_xy>           gr_xy;
@@ -384,7 +431,7 @@ public:
 
         gradient_polymorphic_wrapper_base* gr_ptr = &gr_circle;
 
-//        gr_circle.m_gradient.init(150, 80, 80);
+        // gr_circle.m_gradient.init(150, 80, 80);
 
         switch(m_rbox.cur_item())
         {
@@ -405,6 +452,7 @@ public:
         gradient_span_alloc    span_alloc;
         color_function_profile colors(color_profile, m_profile.gamma());
         interpolator_type      inter(mtx_g1);
+
         gradient_span_gen      span_gen(inter, *gr_ptr, colors, 0, 150);
 
         ras.add_path(t1);
