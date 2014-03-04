@@ -13,6 +13,7 @@
 #include "agg_span_gradient.h"
 #include "agg_span_interpolator_linear.h"
 #include "agg_renderer_scanline.h"
+// #include "agg_path.h"
 #include "ctrl/agg_rbox_ctrl.h"
 #include "ctrl/agg_spline_ctrl.h"
 #include "ctrl/agg_gamma_ctrl.h"
@@ -47,38 +48,77 @@ namespace agg {
     {
     public:
         gradient_radial_2()
-            : m_x(0),
-              m_y(0),
-              i_x(0),
-              i_y(0),
-              m_init(false)
+            : m_r0(0),
+              m_r1(0),
+              m_x0(0),
+              m_x1(0)
         {
         }
+
         ~gradient_radial_2()
         {
-            std::cerr << __PRETTY_FUNCTION__ << " @ X:" << i_x << ";" << m_x << " " << ((::abs(m_x-i_x))>>4)
-                      << " Y:" << i_y << ";" << m_y << " " << ((::abs(m_y-i_y))>>4)<<std::endl;
         }
 
         virtual int calculate(int x,int y,int d) const
         {
             gradient_radial_2 *p = const_cast<gradient_radial_2 *>(this);
 
+            p->m_r0 = (d >> 3);
+            p->m_r1 = (d >> 1);
+
+            p->m_x0 = d >> 1;
+            p->m_x1 = d;
+
+#if 0        
+            double t = (sqrt(( -::pow(m_x1, 2) + 2 * m_x0 * m_x1 - ::pow(m_x0, 2) + ::pow(m_r1, 2) - 2*m_r0*m_r1+::pow(m_r0, 2)) * ::pow(y, 2) + ::pow(m_r0, 2) * ::pow(m_x1, 2) 
+                             + ((2*m_r0*m_r1-2*::pow(m_r0, 2) ) * x - 2 * m_r0 * m_r1 * m_x0) * m_x1 + ::pow(m_r1, 2) 
+                             * ::pow(m_x0, 2) + ( 2 * m_r0 * m_r1 - 2 * ::pow(m_r1, 2) ) * x * m_x0 
+                             + ( ::pow(m_r1, 2) - 2 * m_r0 * m_r1 + ::pow(m_r0, 2)) * ::pow(x, 2)) + (x-m_x0) * m_x1 + ::pow(m_x0, 2) - x * m_x0 + m_r0 * m_r1 - ::pow(m_r0, 2) ) 
+                / ( ::pow(m_x1, 2) - 2 * m_x0 * m_x1 + ::pow(m_x0, 2) - ::pow(m_r1, 2) + 2 * m_r0 * m_r1 - ::pow(m_r0, 2)); 
+
+
+#else
+
+            double t = -(::sqrt((-::pow(m_x1, 2) + 2 * m_x0 * m_x1 - ::pow(m_x0, 2) + ::pow(m_r1, 2) - 2 * m_r0 * m_r1 +::pow(m_r0, 2)) * ::pow(y, 2) + ::pow(m_r0, 2) * ::pow(m_x1, 2)  
+                                + ((2 * m_r0 * m_r1 - 2 * ::pow(m_r0, 2)) * x - 2 * m_r0 * m_r1 * m_x0) * m_x1 + ::pow(m_r1, 2) * ::pow(m_x0, 2) + (2 * m_r0 * m_r1 - 2 * ::pow(m_r1, 2)) 
+                                * x * m_x0 + (::pow(m_r1, 2) - 2 * m_r0 * m_r1 + ::pow(m_r0, 2)) *   
+                                ::pow(x, 2)) + (m_x0 - x) * m_x1 - ::pow(m_x0, 2) + x * m_x0 - m_r0 * m_r1 + ::pow(m_r0, 2))/(::pow(m_x1, 2) - 2 * m_x0 * m_x1 + ::pow(m_x0, 2) - ::pow(m_r1, 2) + 2 * m_r0 * m_r1 - ::pow(m_r0, 2)); 
+#endif
+
+
+#if 0
+            gradient_radial_2 *p = const_cast<gradient_radial_2 *>(this);
             p->m_x = !m_init || p->m_x<x ? x : p->m_x;
             p->m_y = !m_init || p->m_y<y ? y : p->m_y;
             p->i_x = !m_init || p->i_x>x ? x : p->i_x;
             p->i_y = !m_init || p->i_y>y ? y : p->i_y;
 
             p->m_init = true;
-            
-            return d;
-        }
-        int m_x;
-        int m_y;
-        int i_x;
-        int i_y;
 
-        bool m_init;
+            int r0 = (d >> 3);
+            int r1 = (d >> 1);
+
+            int x0 = 0;
+            int x1 = d;
+
+            if( ::sqrt((x-x0)*(x-x0)+y*y) < r0)
+                return 0;
+
+            if( ::sqrt((x1-x)*(x1-x)+y*y) < r1)
+                return 0;
+
+            double t = ::sqrt(x*x+y*y) / double(r1-r0);
+
+
+            return t*d;
+#endif
+            return t*d;
+        }
+
+        double m_x0;
+        double m_x1;
+        double m_r0;
+        double m_r1;
     };
 };
 
@@ -392,18 +432,26 @@ public:
         mtx1 *= agg::trans_affine_translation(center_x, center_y);
         mtx1 *= trans_affine_resizing();
 
+        // agg::ellipse e1;
+        agg::path_storage ps;
 
-        agg::ellipse e1;
-        e1.init(0.0, 0.0, 110.0, 110.0, 64);
+        ps.move_to(-110,-110);
+        ps.line_to(-110,110);
+        ps.line_to(110,110);
+        ps.line_to(110,-110);
+        ps.line_to(-110,-110);
+        ps.close_polygon();
+
+        // e1.init(0.0, 0.0, 110.0, 110.0, 64);
 
         agg::trans_affine mtx_g1;
-
 
         mtx_g1 *= agg::trans_affine_scaling(ini_scale, ini_scale);
         mtx_g1 *= agg::trans_affine_scaling(m_scale, m_scale);
         mtx_g1 *= agg::trans_affine_scaling(m_scale_x, m_scale_y);
-        mtx_g1 *= agg::trans_affine_rotation(m_angle);
+        mtx_g1 *= agg::trans_affine_rotation( m_angle );
         mtx_g1 *= agg::trans_affine_translation(m_center_x, m_center_y);
+        mtx_g1 *= agg::trans_affine_translation(center_x-110, center_y-110);
         mtx_g1 *= trans_affine_resizing();
 
 
@@ -420,8 +468,8 @@ public:
                                                     m_spline_a.spline()[i]));
         }
 
-        agg::conv_transform<agg::ellipse, agg::trans_affine> t1(e1, mtx1);
-
+        // agg::conv_transform<agg::ellipse, agg::trans_affine> t1(e1, mtx1);
+        agg::conv_transform<agg::path_storage, agg::trans_affine> t1(ps, mtx1);
         gradient_polymorphic_wrapper<agg::gradient_radial_2>       gr_circle;
         gradient_polymorphic_wrapper<agg::gradient_diamond>      gr_diamond;
         gradient_polymorphic_wrapper<agg::gradient_x>            gr_x;
@@ -453,9 +501,10 @@ public:
         color_function_profile colors(color_profile, m_profile.gamma());
         interpolator_type      inter(mtx_g1);
 
-        gradient_span_gen      span_gen(inter, *gr_ptr, colors, 0, 150);
+        gradient_span_gen      span_gen(inter, *gr_ptr, colors, 0, 220);
 
         ras.add_path(t1);
+
         agg::render_scanlines_aa(ras, sl, rb, span_alloc, span_gen);
     }
 
