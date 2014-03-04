@@ -63,10 +63,10 @@ namespace agg {
         {
             gradient_radial_2 *p = const_cast<gradient_radial_2 *>(this);
 
-            p->m_r0 = (d >> 3);
+            p->m_r0 = (d >> 2);
             p->m_r1 = (d >> 1);
 
-            p->m_x0 = d >> 1;
+            p->m_x0 = 0;
             p->m_x1 = d;
 
 #if 0        
@@ -112,7 +112,7 @@ namespace agg {
 
             return t*d;
 #endif
-            return t*d;
+            return (t<0 || t>1) ? 0 : t*d;
         }
 
         double m_x0;
@@ -327,6 +327,7 @@ public:
         m_rbox.cur_item(0);
 
         FILE* fd = fopen(full_file_name("settings.dat"), "r");
+
         if(fd)
         {
             float x;
@@ -431,8 +432,11 @@ public:
         mtx1 *= agg::trans_affine_rotation(agg::deg2rad(0.0));
         mtx1 *= agg::trans_affine_translation(center_x, center_y);
         mtx1 *= trans_affine_resizing();
+#if 1
+        agg::ellipse e1;
+        e1.init(0.0, 0.0, 110.0, 110.0, 64);
 
-        // agg::ellipse e1;
+#else
         agg::path_storage ps;
 
         ps.move_to(-110,-110);
@@ -441,8 +445,7 @@ public:
         ps.line_to(110,-110);
         ps.line_to(-110,-110);
         ps.close_polygon();
-
-        // e1.init(0.0, 0.0, 110.0, 110.0, 64);
+#endif
 
         agg::trans_affine mtx_g1;
 
@@ -451,7 +454,7 @@ public:
         mtx_g1 *= agg::trans_affine_scaling(m_scale_x, m_scale_y);
         mtx_g1 *= agg::trans_affine_rotation( m_angle );
         mtx_g1 *= agg::trans_affine_translation(m_center_x, m_center_y);
-        mtx_g1 *= agg::trans_affine_translation(center_x-110, center_y-110);
+        // mtx_g1 *= agg::trans_affine_translation(center_x-110, center_y-110);
         mtx_g1 *= trans_affine_resizing();
 
 
@@ -467,9 +470,11 @@ public:
                                                     m_spline_b.spline()[i],
                                                     m_spline_a.spline()[i]));
         }
-
-        // agg::conv_transform<agg::ellipse, agg::trans_affine> t1(e1, mtx1);
+#if 1
+        agg::conv_transform<agg::ellipse, agg::trans_affine> t1(e1, mtx1);
+#else
         agg::conv_transform<agg::path_storage, agg::trans_affine> t1(ps, mtx1);
+#endif
         gradient_polymorphic_wrapper<agg::gradient_radial_2>       gr_circle;
         gradient_polymorphic_wrapper<agg::gradient_diamond>      gr_diamond;
         gradient_polymorphic_wrapper<agg::gradient_x>            gr_x;
@@ -501,7 +506,7 @@ public:
         color_function_profile colors(color_profile, m_profile.gamma());
         interpolator_type      inter(mtx_g1);
 
-        gradient_span_gen      span_gen(inter, *gr_ptr, colors, 0, 220);
+        gradient_span_gen      span_gen(inter, *gr_ptr, colors, 0, 150);
 
         ras.add_path(t1);
 
