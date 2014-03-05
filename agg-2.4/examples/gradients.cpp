@@ -78,7 +78,6 @@ namespace agg {
         {
             int r0 = m_r0;
             int r1 = m_r1;
-
             int x0 = m_x0;
             int x1 = m_x1;
 
@@ -106,7 +105,6 @@ namespace agg {
         }
 
     private:
-
         double f0(int x,int y,int x0,int x1,int r0,int r1) const
         {
             return -(::sqrt((-::pow(x1, 2) + 2 * x0 * x1 - ::pow(x0, 2) + ::pow(r1, 2) - 2 * r0 * r1 +::pow(r0, 2)) * ::pow(y, 2) + ::pow(r0, 2) * ::pow(x1, 2)
