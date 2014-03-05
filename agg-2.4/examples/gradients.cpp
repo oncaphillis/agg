@@ -44,81 +44,89 @@ public:
 };
 
 namespace agg {
-    class gradient_radial_2
+
+    /** Plugin for gradient_polymorphic_wrapper<...> which generates a
+     * radial grandient as in PDF or Postscript documents.
+     * The gradient is defined between two circles which do *not*
+     * have to be concenctrical.
+     *
+     * The series of circles may be defined an a horizontal line (x0..y1)
+     * with radiues (r0...r1). For a given x we nay calculate y = f(x,t) as.
+     *
+     * y = sqrt( ( r0 + ( r1 - r0 ) * t ) ^ 2 - ( x -  ( x0 + ( x1 - x0 ) * t ) ) ^ 2 )
+     *
+     * The gradient has to solve the problem t = f(x,y) for which there are two solutions.
+     */
+
+    class gradient_biradial
     {
     public:
-        gradient_radial_2()
-            : m_r0(0),
-              m_r1(0),
-              m_x0(0),
-              m_x1(0)
+        gradient_biradial()
+            :m_r0(0),
+             m_r1(0),
+             m_x0(0),
+             m_x1(0)
         {
         }
 
-        ~gradient_radial_2()
+        ~gradient_biradial()
         {
         }
+
 
         virtual int calculate(int x,int y,int d) const
         {
-            gradient_radial_2 *p = const_cast<gradient_radial_2 *>(this);
+            int r0 = m_r0;
+            int r1 = m_r1;
 
-            p->m_r0 = (d >> 2);
-            p->m_r1 = (d >> 1);
+            int x0 = m_x0;
+            int x1 = m_x1;
 
-            p->m_x0 = 0;
-            p->m_x1 = d;
+            double t = f1(x,y,x0,x1,r0,r1);
 
-#if 0        
-            double t = (sqrt(( -::pow(m_x1, 2) + 2 * m_x0 * m_x1 - ::pow(m_x0, 2) + ::pow(m_r1, 2) - 2*m_r0*m_r1+::pow(m_r0, 2)) * ::pow(y, 2) + ::pow(m_r0, 2) * ::pow(m_x1, 2) 
-                             + ((2*m_r0*m_r1-2*::pow(m_r0, 2) ) * x - 2 * m_r0 * m_r1 * m_x0) * m_x1 + ::pow(m_r1, 2) 
-                             * ::pow(m_x0, 2) + ( 2 * m_r0 * m_r1 - 2 * ::pow(m_r1, 2) ) * x * m_x0 
-                             + ( ::pow(m_r1, 2) - 2 * m_r0 * m_r1 + ::pow(m_r0, 2)) * ::pow(x, 2)) + (x-m_x0) * m_x1 + ::pow(m_x0, 2) - x * m_x0 + m_r0 * m_r1 - ::pow(m_r0, 2) ) 
-                / ( ::pow(m_x1, 2) - 2 * m_x0 * m_x1 + ::pow(m_x0, 2) - ::pow(m_r1, 2) + 2 * m_r0 * m_r1 - ::pow(m_r0, 2)); 
+            if(t!=t || t< 0 || t>1)
+                t = f0(x,y,x0,x1,r0,r1);
 
-
-#else
-
-            double t = -(::sqrt((-::pow(m_x1, 2) + 2 * m_x0 * m_x1 - ::pow(m_x0, 2) + ::pow(m_r1, 2) - 2 * m_r0 * m_r1 +::pow(m_r0, 2)) * ::pow(y, 2) + ::pow(m_r0, 2) * ::pow(m_x1, 2)  
-                                + ((2 * m_r0 * m_r1 - 2 * ::pow(m_r0, 2)) * x - 2 * m_r0 * m_r1 * m_x0) * m_x1 + ::pow(m_r1, 2) * ::pow(m_x0, 2) + (2 * m_r0 * m_r1 - 2 * ::pow(m_r1, 2)) 
-                                * x * m_x0 + (::pow(m_r1, 2) - 2 * m_r0 * m_r1 + ::pow(m_r0, 2)) *   
-                                ::pow(x, 2)) + (m_x0 - x) * m_x1 - ::pow(m_x0, 2) + x * m_x0 - m_r0 * m_r1 + ::pow(m_r0, 2))/(::pow(m_x1, 2) - 2 * m_x0 * m_x1 + ::pow(m_x0, 2) - ::pow(m_r1, 2) + 2 * m_r0 * m_r1 - ::pow(m_r0, 2)); 
-#endif
-
-
-#if 0
-            gradient_radial_2 *p = const_cast<gradient_radial_2 *>(this);
-            p->m_x = !m_init || p->m_x<x ? x : p->m_x;
-            p->m_y = !m_init || p->m_y<y ? y : p->m_y;
-            p->i_x = !m_init || p->i_x>x ? x : p->i_x;
-            p->i_y = !m_init || p->i_y>y ? y : p->i_y;
-
-            p->m_init = true;
-
-            int r0 = (d >> 3);
-            int r1 = (d >> 1);
-
-            int x0 = 0;
-            int x1 = d;
-
-            if( ::sqrt((x-x0)*(x-x0)+y*y) < r0)
+            if(t==t && t>1)
+                return d;
+            if(t==t && t<0)
                 return 0;
-
-            if( ::sqrt((x1-x)*(x1-x)+y*y) < r1)
-                return 0;
-
-            double t = ::sqrt(x*x+y*y) / double(r1-r0);
-
-
-            return t*d;
-#endif
-            return (t<0 || t>1) ? 0 : t*d;
+            return (t!=t || t<0 /*|| t>1*/) ? 0 : t*d;
         }
 
-        double m_x0;
-        double m_x1;
-        double m_r0;
-        double m_r1;
+        void set_radius(int r0,int r1)
+        {
+            m_r0 = r0 << gradient_subpixel_shift;
+            m_r1 = r1 << gradient_subpixel_shift;
+        }
+        void set_center(int x0,int x1)
+        {
+            m_x0 = x0 << gradient_subpixel_shift;
+            m_x1 = x1 << gradient_subpixel_shift;
+        }
+
+    private:
+
+        double f0(int x,int y,int x0,int x1,int r0,int r1) const
+        {
+            return -(::sqrt((-::pow(x1, 2) + 2 * x0 * x1 - ::pow(x0, 2) + ::pow(r1, 2) - 2 * r0 * r1 +::pow(r0, 2)) * ::pow(y, 2) + ::pow(r0, 2) * ::pow(x1, 2)
+                         + ((2 * r0 * r1 - 2 * ::pow(r0, 2)) * x - 2 * r0 * r1 * x0) * x1 + ::pow(r1, 2) * ::pow(x0, 2) + (2 * r0 * r1 - 2 * ::pow(r1, 2))
+                         * x * x0 + (::pow(r1, 2) - 2 * r0 * r1 + ::pow(r0, 2)) *
+                           ::pow(x, 2)) + (x0 - x) * x1 - ::pow(x0, 2) + x * x0 - r0 * r1 + ::pow(r0, 2))/(::pow(x1, 2) - 2 * x0 * x1 + ::pow(x0, 2) - ::pow(r1, 2) + 2 * r0 * r1 - ::pow(r0, 2));
+        }
+
+        double f1(int x,int y,int x0,int x1,int r0,int r1) const
+        {
+            return (sqrt(( -::pow(x1, 2) + 2 * x0 * x1 - ::pow(x0, 2) + ::pow(r1, 2) - 2*r0*r1+::pow(r0, 2)) * ::pow(y, 2) + ::pow(r0, 2) * ::pow(x1, 2)
+                             + ((2*r0*r1-2*::pow(r0, 2) ) * x - 2 * r0 * r1 * x0) * x1 + ::pow(r1, 2)
+                             * ::pow(x0, 2) + ( 2 * r0 * r1 - 2 * ::pow(r1, 2) ) * x * x0
+                             + ( ::pow(r1, 2) - 2 * r0 * r1 + ::pow(r0, 2)) * ::pow(x, 2)) + (x-x0) * x1 + ::pow(x0, 2) - x * x0 + r0 * r1 - ::pow(r0, 2) )
+                / ( ::pow(x1, 2) - 2 * x0 * x1 + ::pow(x0, 2) - ::pow(r1, 2) + 2 * r0 * r1 - ::pow(r0, 2));
+        }
+        int m_r0;
+        int m_r1;
+        int m_x0;
+        int m_x1;
     };
 };
 
@@ -162,7 +170,7 @@ class the_application : public agg::platform_support
     agg::spline_ctrl<agg::rgba8> m_spline_g;
     agg::spline_ctrl<agg::rgba8> m_spline_b;
     agg::spline_ctrl<agg::rgba8> m_spline_a;
-    agg::rbox_ctrl<agg::rgba8>   m_rbox;
+    agg::rbox_ctrl<agg::rgba8>   rbox;
 
     double m_pdx;
     double m_pdy;
@@ -250,7 +258,7 @@ public:
         m_spline_g(210, 10+40,  210+250, 5+80,  6, !flip_y),
         m_spline_b(210, 10+80,  210+250, 5+120, 6, !flip_y),
         m_spline_a(210, 10+120, 210+250, 5+160, 6, !flip_y),
-        m_rbox(10.0, 180.0, 200.0, 300.0, !flip_y),
+        rbox(10.0, 180.0, 200.0, 320.0, !flip_y),
 
         m_pdx(0.0),
         m_pdy(0.0),
@@ -271,7 +279,7 @@ public:
         add_ctrl(m_spline_g);
         add_ctrl(m_spline_b);
         add_ctrl(m_spline_a);
-        add_ctrl(m_rbox);
+        add_ctrl(rbox);
 
         m_profile.border_width(2.0, 2.0);
 
@@ -284,7 +292,7 @@ public:
         m_spline_g.border_width(1.0, 2.0);
         m_spline_b.border_width(1.0, 2.0);
         m_spline_a.border_width(1.0, 2.0);
-        m_rbox.border_width(2.0, 2.0);
+        rbox.border_width(2.0, 2.0);
 
         m_spline_r.point(0, 0.0,     1.0);
         m_spline_r.point(1, 1.0/5.0, 1.0 - 1.0/5.0);
@@ -318,13 +326,14 @@ public:
         m_spline_a.point(5, 1.0,     1.0);
         m_spline_a.update_spline();
 
-        m_rbox.add_item("Circular");
-        m_rbox.add_item("Diamond");
-        m_rbox.add_item("Linear");
-        m_rbox.add_item("XY");
-        m_rbox.add_item("sqrt(XY)");
-        m_rbox.add_item("Conic");
-        m_rbox.cur_item(0);
+        rbox.add_item("Bicircular");
+        rbox.add_item("Circular");
+        rbox.add_item("Diamond");
+        rbox.add_item("Linear");
+        rbox.add_item("XY");
+        rbox.add_item("sqrt(XY)");
+        rbox.add_item("Conic");
+        rbox.cur_item(0);
 
         FILE* fd = fopen(full_file_name("settings.dat"), "r");
 
@@ -422,7 +431,7 @@ public:
         agg::render_ctrl(ras, sl, rb, m_spline_g);
         agg::render_ctrl(ras, sl, rb, m_spline_b);
         agg::render_ctrl(ras, sl, rb, m_spline_a);
-        agg::render_ctrl(ras, sl, rb, m_rbox);
+        agg::render_ctrl(ras, sl, rb, rbox);
 
         double ini_scale = 1.0;
 
@@ -475,24 +484,29 @@ public:
 #else
         agg::conv_transform<agg::path_storage, agg::trans_affine> t1(ps, mtx1);
 #endif
-        gradient_polymorphic_wrapper<agg::gradient_radial_2>       gr_circle;
+        gradient_polymorphic_wrapper<agg::gradient_biradial>     gr_bicircle;
+        gradient_polymorphic_wrapper<agg::gradient_radial>       gr_circle;
         gradient_polymorphic_wrapper<agg::gradient_diamond>      gr_diamond;
         gradient_polymorphic_wrapper<agg::gradient_x>            gr_x;
         gradient_polymorphic_wrapper<agg::gradient_xy>           gr_xy;
         gradient_polymorphic_wrapper<agg::gradient_sqrt_xy>      gr_sqrt_xy;
         gradient_polymorphic_wrapper<agg::gradient_conic>        gr_conic;
 
-        gradient_polymorphic_wrapper_base* gr_ptr = &gr_circle;
+        gr_bicircle.m_gradient.set_radius(15,75);
+        gr_bicircle.m_gradient.set_center(0,120);
+
+        gradient_polymorphic_wrapper_base* gr_ptr = &gr_bicircle;
 
         // gr_circle.m_gradient.init(150, 80, 80);
 
-        switch(m_rbox.cur_item())
+        switch(rbox.cur_item())
         {
-            case 1: gr_ptr = &gr_diamond; break;
-            case 2: gr_ptr = &gr_x;       break;
-            case 3: gr_ptr = &gr_xy;      break;
-            case 4: gr_ptr = &gr_sqrt_xy; break;
-            case 5: gr_ptr = &gr_conic;   break;
+            case 1: gr_ptr = &gr_circle;   break;
+            case 2: gr_ptr = &gr_diamond; break;
+            case 3: gr_ptr = &gr_x;       break;
+            case 4: gr_ptr = &gr_xy;      break;
+            case 5: gr_ptr = &gr_sqrt_xy; break;
+            case 6: gr_ptr = &gr_conic;   break;
         }
 
         typedef agg::span_interpolator_linear<> interpolator_type;
