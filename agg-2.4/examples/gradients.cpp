@@ -63,11 +63,11 @@ namespace agg {
         {
             gradient_radial_2 *p = const_cast<gradient_radial_2 *>(this);
 
-            p->m_r0 = (d >> 2);
-            p->m_r1 = (d >> 1);
+            p->m_r0 = (d >> 1);
+            p->m_r1 = (d >> 2);
 
-            p->m_x0 = 0;
-            p->m_x1 = d;
+            p->m_x0 = d >> 1;
+            p->m_x1 = d - d>>1;
 
 #if 0        
             double t = (sqrt(( -::pow(m_x1, 2) + 2 * m_x0 * m_x1 - ::pow(m_x0, 2) + ::pow(m_r1, 2) - 2*m_r0*m_r1+::pow(m_r0, 2)) * ::pow(y, 2) + ::pow(m_r0, 2) * ::pow(m_x1, 2) 
@@ -79,10 +79,23 @@ namespace agg {
 
 #else
 
-            double t = -(::sqrt((-::pow(m_x1, 2) + 2 * m_x0 * m_x1 - ::pow(m_x0, 2) + ::pow(m_r1, 2) - 2 * m_r0 * m_r1 +::pow(m_r0, 2)) * ::pow(y, 2) + ::pow(m_r0, 2) * ::pow(m_x1, 2)  
-                                + ((2 * m_r0 * m_r1 - 2 * ::pow(m_r0, 2)) * x - 2 * m_r0 * m_r1 * m_x0) * m_x1 + ::pow(m_r1, 2) * ::pow(m_x0, 2) + (2 * m_r0 * m_r1 - 2 * ::pow(m_r1, 2)) 
+
+            dd = -(::sqrt(dd)
+                   + (m_x0 - x) * m_x1 - ::pow(m_x0, 2) + x * m_x0 - m_r0 * m_r1 
+                   + ::pow(m_r0, 2)) 
+                / (::pow(m_x1, 2) - 2 * m_x0 * m_x1 + ::pow(m_x0, 2) - ::pow(m_r1, 2) + 2 * m_r0 * m_r1 - ::pow(m_r0, 2)); 
+                   
+            double t = -(::sqrt((-::pow(m_x1, 2) + 2 * m_x0 * m_x1 - ::pow(m_x0, 2) + ::pow(m_r1, 2) - 2 
+                                 * m_r0 * m_r1 +::pow(m_r0, 2)) * ::pow(y, 2) + ::pow(m_r0, 2) * ::pow(m_x1, 2)  
+                                + ((2 * m_r0 * m_r1 - 2 * ::pow(m_r0, 2)) * x - 2 * m_r0 * m_r1 * m_x0) 
+                                * m_x1 + ::pow(m_r1, 2) * ::pow(m_x0, 2) + (2 * m_r0 * m_r1 - 2 * ::pow(m_r1, 2)) 
                                 * x * m_x0 + (::pow(m_r1, 2) - 2 * m_r0 * m_r1 + ::pow(m_r0, 2)) *   
-                                ::pow(x, 2)) + (m_x0 - x) * m_x1 - ::pow(m_x0, 2) + x * m_x0 - m_r0 * m_r1 + ::pow(m_r0, 2))/(::pow(m_x1, 2) - 2 * m_x0 * m_x1 + ::pow(m_x0, 2) - ::pow(m_r1, 2) + 2 * m_r0 * m_r1 - ::pow(m_r0, 2)); 
+                                ::pow(x, 2))
+                         + (m_x0 - x) * m_x1 - ::pow(m_x0, 2) + x * m_x0 - m_r0 * m_r1 
+                         + ::pow(m_r0, 2)) 
+                / (::pow(m_x1, 2) - 2 * m_x0 * m_x1 + ::pow(m_x0, 2) - ::pow(m_r1, 2) + 2 * m_r0 * m_r1 - ::pow(m_r0, 2)); 
+
+
 #endif
 
 
@@ -112,7 +125,7 @@ namespace agg {
 
             return t*d;
 #endif
-            return (t<0 || t>1) ? 0 : t*d;
+            return (t!=t || t < 0 || t > 1 ) ? 0 : t*d;
         }
 
         double m_x0;
