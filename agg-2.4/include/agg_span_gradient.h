@@ -289,7 +289,11 @@ namespace agg
      *
      * y = sqrt( ( r0 + ( r1 - r0 ) * t ) ^ 2 - ( x -  ( x0 + ( x1 - x0 ) * t ) ) ^ 2 )
      *
-     * The gradient has to solve the problem t = f(x,y) for which there are two solutions.
+     * The gradient has to solve the problem t = f(x,y) for which there are two solutions
+     * implemented in the method fl(...) and fr(...)
+     *
+     * In contrast to theother gradient_* classes the calculate method of this class
+     * is *not* static since we need the values r0 and r1 attached to the gradient.
      */
 
     class gradient_biradial
@@ -306,7 +310,7 @@ namespace agg
         {
         }
 
-        virtual int calculate(int x,int y,int d) const
+        int calculate(int x,int y,int d) const
         {
             double t = fl(x,y);
 
