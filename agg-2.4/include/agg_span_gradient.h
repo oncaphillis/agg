@@ -1,6 +1,7 @@
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
+// Copyright (C) 2014 Sebastian Kloska (oncaphillis@snafu.de)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -275,6 +276,108 @@ namespace agg
         double m_mul;
     };
 
+
+    //==============================================================gradient_biradial
+
+    /** A gradient which generates a
+     * radial grandient as in PDF or Postscript documents.
+     * The gradient is defined between two circles which do *not*
+     * have to be concenctrical.
+     *
+     * The series of circles may be defined an a horizontal line (x0..y1)
+     * with radiues (r0...r1). For a given x we nay calculate y = f(x,t) as.
+     *
+     * y = sqrt( ( r0 + ( r1 - r0 ) * t ) ^ 2 - ( x -  ( x0 + ( x1 - x0 ) * t ) ) ^ 2 )
+     *
+     * The gradient has to solve the problem t = f(x,y) for which there are two solutions.
+     */
+
+    class gradient_biradial
+    {
+    public:
+        gradient_biradial()
+            :m_r0(0), m_r1(0), m_x0(0), m_x1(0), m_xi(0),
+             m_c0(0), m_c1(0), m_c2(0), m_c3(0),
+             m_c4(0), m_c5(0), m_c6(0)
+        {
+        }
+
+        ~gradient_biradial()
+        {
+        }
+
+        virtual int calculate(int x,int y,int d) const
+        {
+            double t = fl(x,y);
+
+            if( t!=t || t> 1 )
+                t = fr(x,y);
+            
+            // Here we have to fine tune whenever we implment a proper [extend,extend]
+            // like in PDF or Postscript
+            return t!=t ? 0 : t * d < m_xi ? 0 : t < 0 ? 0 : t > 1 ? d : t * d;
+        }
+
+        void set_radius(int r0,int r1)
+        {
+            m_r0 = r0 << gradient_subpixel_shift;
+            m_r1 = r1 << gradient_subpixel_shift;
+            calc_const();
+        }
+
+        void set_center(int x0,int x1)
+        {
+            m_x0 = x0 << gradient_subpixel_shift;
+            m_x1 = x1 << gradient_subpixel_shift;
+            calc_const();
+        }
+
+    private:
+
+        /** Recalculate the constants for our t=f(x,y). There are a couple
+         * of values only depending on r0..r1 and x0..x1 which we only have
+         * to calculate once whenever these values change.
+         */
+
+        void calc_const()
+        {
+            m_c0 =  ( m_x1 * m_x1) - 2 * m_x0 * m_x1 + (m_x0 * m_x0) - (m_r1 * m_r1) + 2 * m_r0 * m_r1 - (m_r0 * m_r0);
+            m_c1 = -( m_x1 * m_x1) + 2 * m_x0 * m_x1 - (m_x0 * m_x0) + (m_r1 * m_r1) - 2 * m_r0 * m_r1 + (m_r0 * m_r0);
+            m_c2 = m_r0 * m_r0 * m_x1 * m_x1;
+            m_c3 = 2 * m_r0 * m_r1 - 2 * m_r0 * m_r0;
+            m_c4 = 2 * m_r0 * m_r1 * m_x0;
+            m_c5 = (2 * m_r0 * m_r1 - 2 * (m_r1 * m_r1));
+            m_c6 = (m_r1 * m_r1) - 2 * m_r0 * m_r1 + (m_r0* m_r0);
+
+            // This is the absolut minimum for which we calculate values
+            m_xi = -m_r0 / ((m_r1 - m_r0) / (m_x1 - m_x0)) + m_x0;
+        }
+
+        // The first solution for t = f(x,y)
+        double fr(int x,int y) const
+        {
+            return -(::sqrt( double(m_c1) * double(y *y) + m_c2 + (m_c3 * x - m_c4)
+                         * m_x1 + (m_r1 * m_r1) * (m_x0 * m_x0) + m_c5 * x * m_x0 + m_c6 * double(x * x))
+                      + (m_x0 - x) * m_x1 - (m_x0 * m_x0) + double(x) * m_x0 - m_r0 * m_r1 + (m_r0 * m_r0))
+                    / double(m_c0);
+        }
+
+        // The second solution for t = f(x,y)
+        double fl(int x,int y) const
+        {
+            return (sqrt( double(m_c1) * double(y * y) + m_c2 + (m_c3 * x - m_c4) * m_x1
+                          + (m_r1 * m_r1) * (m_x0 * m_x0) + m_c5 * x * m_x0 + m_c6 * double(x*x))
+                    + double(x-m_x0) * m_x1 + (m_x0 * m_x0) - double(x) * m_x0 + m_r0 * m_r1 - (m_r0 * m_r0) )
+                / double(m_c0);
+        }
+
+        // minimal and maximal x and r
+        double m_r0, m_r1, m_x0, m_x1,m_xi;
+
+        // various constants we can pre-calc for t = f(x,y)
+        double m_c0, m_c1, m_c2, m_c3;
+        double m_c4, m_c5, m_c6;
+    };
 
     //==============================================================gradient_x
     class gradient_x

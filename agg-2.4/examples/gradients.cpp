@@ -44,88 +44,6 @@ public:
 };
 
 namespace agg {
-
-    /** Plugin for gradient_polymorphic_wrapper<...> which generates a
-     * radial grandient as in PDF or Postscript documents.
-     * The gradient is defined between two circles which do *not*
-     * have to be concenctrical.
-     *
-     * The series of circles may be defined an a horizontal line (x0..y1)
-     * with radiues (r0...r1). For a given x we nay calculate y = f(x,t) as.
-     *
-     * y = sqrt( ( r0 + ( r1 - r0 ) * t ) ^ 2 - ( x -  ( x0 + ( x1 - x0 ) * t ) ) ^ 2 )
-     *
-     * The gradient has to solve the problem t = f(x,y) for which there are two solutions.
-     */
-
-    class gradient_biradial
-    {
-    public:
-        gradient_biradial()
-            :m_r0(0),
-             m_r1(0),
-             m_x0(0),
-             m_x1(0)
-        {
-        }
-
-        ~gradient_biradial()
-        {
-        }
-
-
-        virtual int calculate(int x,int y,int d) const
-        {
-            int r0 = m_r0;
-            int r1 = m_r1;
-            int x0 = m_x0;
-            int x1 = m_x1;
-
-            double t = f1(x,y,x0,x1,r0,r1);
-
-            if(t!=t || t< 0 || t>1)
-                t = f0(x,y,x0,x1,r0,r1);
-
-            if(t==t && t>1)
-                return d;
-            if(t==t && t<0)
-                return 0;
-            return (t!=t || t<0 /*|| t>1*/) ? 0 : t*d;
-        }
-
-        void set_radius(int r0,int r1)
-        {
-            m_r0 = r0 << gradient_subpixel_shift;
-            m_r1 = r1 << gradient_subpixel_shift;
-        }
-        void set_center(int x0,int x1)
-        {
-            m_x0 = x0 << gradient_subpixel_shift;
-            m_x1 = x1 << gradient_subpixel_shift;
-        }
-
-    private:
-        double f0(int x,int y,int x0,int x1,int r0,int r1) const
-        {
-            return -(::sqrt((-::pow(x1, 2) + 2 * x0 * x1 - ::pow(x0, 2) + ::pow(r1, 2) - 2 * r0 * r1 +::pow(r0, 2)) * ::pow(y, 2) + ::pow(r0, 2) * ::pow(x1, 2)
-                         + ((2 * r0 * r1 - 2 * ::pow(r0, 2)) * x - 2 * r0 * r1 * x0) * x1 + ::pow(r1, 2) * ::pow(x0, 2) + (2 * r0 * r1 - 2 * ::pow(r1, 2))
-                         * x * x0 + (::pow(r1, 2) - 2 * r0 * r1 + ::pow(r0, 2)) *
-                           ::pow(x, 2)) + (x0 - x) * x1 - ::pow(x0, 2) + x * x0 - r0 * r1 + ::pow(r0, 2))/(::pow(x1, 2) - 2 * x0 * x1 + ::pow(x0, 2) - ::pow(r1, 2) + 2 * r0 * r1 - ::pow(r0, 2));
-        }
-
-        double f1(int x,int y,int x0,int x1,int r0,int r1) const
-        {
-            return (sqrt(( -::pow(x1, 2) + 2 * x0 * x1 - ::pow(x0, 2) + ::pow(r1, 2) - 2*r0*r1+::pow(r0, 2)) * ::pow(y, 2) + ::pow(r0, 2) * ::pow(x1, 2)
-                             + ((2*r0*r1-2*::pow(r0, 2) ) * x - 2 * r0 * r1 * x0) * x1 + ::pow(r1, 2)
-                             * ::pow(x0, 2) + ( 2 * r0 * r1 - 2 * ::pow(r1, 2) ) * x * x0
-                             + ( ::pow(r1, 2) - 2 * r0 * r1 + ::pow(r0, 2)) * ::pow(x, 2)) + (x-x0) * x1 + ::pow(x0, 2) - x * x0 + r0 * r1 - ::pow(r0, 2) )
-                / ( ::pow(x1, 2) - 2 * x0 * x1 + ::pow(x0, 2) - ::pow(r1, 2) + 2 * r0 * r1 - ::pow(r0, 2));
-        }
-        int m_r0;
-        int m_r1;
-        int m_x0;
-        int m_x1;
-    };
 };
 
 template<class GradientF> 
@@ -490,8 +408,8 @@ public:
         gradient_polymorphic_wrapper<agg::gradient_sqrt_xy>      gr_sqrt_xy;
         gradient_polymorphic_wrapper<agg::gradient_conic>        gr_conic;
 
-        gr_bicircle.m_gradient.set_radius(15,75);
-        gr_bicircle.m_gradient.set_center(0,120);
+        gr_bicircle.m_gradient.set_radius(10,110);
+        gr_bicircle.m_gradient.set_center(0,150);
 
         gradient_polymorphic_wrapper_base* gr_ptr = &gr_bicircle;
 
