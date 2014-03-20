@@ -12,12 +12,15 @@ Changes for now
 
  * made some operators for **agg::trans_affine** const
 
- * added **agg_color_cmyka** and **agg_pixfmt_cmyk**
-   Everything we need to paint in CMYK colorspace.
+ * added  **agg_color_cmyka**  and  **agg_pixfmt_cmyk** Everything  we
+   need to paint in CMYK colorspace.
 
- * added **add::gradient_biradial** a plugin class for the gradient calculation
-   which supports the radial gradient filling as specified for PDF/Postscript
+ * added  **add::gradient_biradial** a  plugin  class for the gradient
+   calculation which supports the radial gradient filling as specified
+   for PDF/Postscript
 
- * removed global constant **gradient_subpixel_shift** and allow GradientF template
-   argument to "inherit" its personal subpixel_shift  value. This way it is possible
-   to generate gradients of variable "smoothness".
+ * removed     global  constant **gradient_subpixel_shift**  and allow
+   GradientF    template    argument   to    "inherit"  its   personal
+   subpixel_shift value. This way it is possible to generate gradients
+   of variable "smoothness".
+
