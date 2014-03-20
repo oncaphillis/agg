@@ -40,7 +40,8 @@ namespace agg
 {
 
 	//==========================================================gradient_contour
-	class gradient_contour
+    template<class T=void>
+    class basic_gradient_contour
 	{
 	private:
 		int8u* m_buffer;
@@ -52,7 +53,7 @@ namespace agg
 		double m_d2; 
 
 	public:
-		gradient_contour() :
+        basic_gradient_contour() :
 			m_buffer(NULL),
 			m_width(0),
 			m_height(0),
@@ -62,7 +63,7 @@ namespace agg
 		{
 		}
 
-		gradient_contour(double d1, double d2) :
+        basic_gradient_contour(double d1, double d2) :
 			m_buffer(NULL),
 			m_width(0),
 			m_height(0),
@@ -72,7 +73,7 @@ namespace agg
 		{
 		}
 
-		~gradient_contour()
+        ~basic_gradient_contour()
 		{
 			if (m_buffer)
 			{
@@ -95,8 +96,8 @@ namespace agg
 		{
 			if (m_buffer)
 			{
-				int px = x >> agg::gradient_subpixel_shift;
-				int py = y >> agg::gradient_subpixel_shift;
+                int px = x >> gradient_props<T>::subpixel_shift;
+                int py = y >> gradient_props<T>::subpixel_shift;
 
 				px %= m_width;
 
@@ -112,7 +113,7 @@ namespace agg
 					py += m_height;
 				}
 
-				return iround(m_buffer[py * m_width + px ] * (m_d2 / 256 ) + m_d1 ) << gradient_subpixel_shift;
+                return iround(m_buffer[py * m_width + px ] * (m_d2 / 256 ) + m_d1 ) << gradient_props<T>::subpixel_shift;
 
 			}
 			else
@@ -122,6 +123,7 @@ namespace agg
 		}
 
 	};
+    typedef basic_gradient_contour<> gradient_contour;
 
 	static AGG_INLINE int square(int x ) { return x * x; }
 
@@ -166,7 +168,8 @@ namespace agg
 	}
 
 	// DT algorithm by: Pedro Felzenszwalb
-	int8u* gradient_contour::contour_create(path_storage* ps )
+    template<typename T>
+    int8u* basic_gradient_contour<T>::contour_create(path_storage* ps )
 	{
 		int8u* result = NULL;
 

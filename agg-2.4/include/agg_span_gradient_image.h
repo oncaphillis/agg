@@ -58,7 +58,8 @@ namespace agg
 	};
 
 	//==========================================================gradient_image
-	template<class ColorT> class gradient_image
+    template<class ColorT,typename T=void>
+    class gradient_image
 	{
 	private:
 		//------------ fields
@@ -141,8 +142,8 @@ namespace agg
 		{
 			if (m_buffer)
 			{
-				int px = x >> agg::gradient_subpixel_shift;
-				int py = y >> agg::gradient_subpixel_shift;
+                int px = x >> gradient_props<T>::subpixel_shift;
+                int py = y >> gradient_props<T>::subpixel_shift;
 
 				px %= m_width;
 
