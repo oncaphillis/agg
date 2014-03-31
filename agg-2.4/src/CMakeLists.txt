@@ -57,6 +57,7 @@ SET( antigrain_HEADERS
     ${antigrain_SOURCE_DIR}/include/agg_pattern_filters_rgba.h
     ${antigrain_SOURCE_DIR}/include/agg_pixfmt_amask_adaptor.h
     ${antigrain_SOURCE_DIR}/include/agg_pixfmt_cmyk.h
+    ${antigrain_SOURCE_DIR}/include/agg_pixfmt_device_n.h
     ${antigrain_SOURCE_DIR}/include/agg_pixfmt_gray.h
     ${antigrain_SOURCE_DIR}/include/agg_pixfmt_rgb.h
     ${antigrain_SOURCE_DIR}/include/agg_pixfmt_rgb_packed.h

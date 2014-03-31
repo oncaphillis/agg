@@ -32,9 +32,11 @@ namespace agg
 {
     // Supported byte orders for CMYK and CMYKA pixel formats
     //=======================================================================
-    
-    // struct order_cmyk   { enum cmyk_e  { C=0, M=1, Y=2, K=3, cmyk_tag, hasAlpha=false    }; }; // ---- order_cmyk
-    // struct order_cmyka  { enum cmyk_e  { C=0, M=1, Y=2, K=3, A=4, cmyk_tag,hasAlpha=true }; }; // ---- order_cmyka
+    template<int N>
+    struct order_device_n   { enum cmyk_e  { C=0, M=1, Y=2, K=3, cmyk_tag, hasAlpha=false    }; }; // ---- order_cmyk
+
+    template<int N>
+    struct order_devive_na  { enum cmyk_e  { C=0, M=1, Y=2, K=3, A=4, cmyk_tag,hasAlpha=true }; }; // ---- order_cmyka
     
     //====================================================================rgba
     template<int N>
