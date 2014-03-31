@@ -12,6 +12,7 @@ SET( antigrain_HEADERS
     ${antigrain_SOURCE_DIR}/include/agg_bspline.h
     ${antigrain_SOURCE_DIR}/include/agg_clip_liang_barsky.h
     ${antigrain_SOURCE_DIR}/include/agg_color_cmyka.h
+    ${antigrain_SOURCE_DIR}/include/agg_color_device_na.h
     ${antigrain_SOURCE_DIR}/include/agg_color_gray.h
     ${antigrain_SOURCE_DIR}/include/agg_color_rgba.h
     ${antigrain_SOURCE_DIR}/include/agg_config.h

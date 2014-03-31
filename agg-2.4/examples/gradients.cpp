@@ -9,6 +9,7 @@
 #include "agg_conv_transform.h"
 #include "agg_color_rgba.h"
 #include "agg_color_gray.h"
+#include "agg_color_device_na.h"
 #include "agg_span_allocator.h"
 #include "agg_span_gradient.h"
 #include "agg_span_interpolator_linear.h"
