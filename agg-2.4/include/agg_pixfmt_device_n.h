@@ -27,7 +27,7 @@
 
 #include <string.h>
 #include "agg_basics.h"
-#include "agg_color_cmyka.h"
+#include "agg_color_device_na.h"
 #include "agg_rendering_buffer.h"
 
 namespace agg
@@ -79,7 +79,7 @@ namespace agg
 
 
     //=========================================================blender_device_n
-    template<class ColorT, class Order,int N>
+    template<class ColorT, class Order>
     struct blender_device_n
     {
         typedef ColorT color_type;
@@ -186,7 +186,7 @@ namespace agg
 
     
     //==================================================pixfmt_alpha_device_n_rgb
-    template<class Blender, class RenBuf,int N>
+    template<class Blender, class RenBuf>
     class pixfmt_alpha_blend_device_n
     {
     public:
@@ -830,7 +830,7 @@ namespace agg
     };
 
     //----pixfmt_device_n_32
-    typedef pixfmt_alpha_blend_cmyk<blender_cmyk<device_n_8<4>,  order_cmyk>, rendering_buffer>   pixfmt_device_n_32;
+    typedef pixfmt_alpha_blend_device_n<blender_device_n<device_na8<4>,  order_cmyk>, rendering_buffer>   pixfmt_device_n_32;
 }
 
 #endif // AGG_PIXFMT_DEVICE_N_INCLUDED
