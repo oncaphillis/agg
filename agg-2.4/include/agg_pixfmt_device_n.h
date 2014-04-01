@@ -40,7 +40,7 @@ namespace agg
     public:
         typedef typename ColorT::value_type value_type;
 
-        apply_gamma_dir_cmyk(const GammaLut& gamma) : m_gamma(gamma) {}
+        apply_gamma_dir_device_n(const GammaLut& gamma) : m_gamma(gamma) {}
 
         AGG_INLINE void operator () (value_type * p)
         {
@@ -63,7 +63,7 @@ namespace agg
     public:
         typedef typename ColorT::value_type value_type;
 
-        apply_gamma_inv_cmyk(const GammaLut& gamma) : m_gamma(gamma) {}
+        apply_gamma_inv_device_n(const GammaLut& gamma) : m_gamma(gamma) {}
 
         AGG_INLINE void operator () (value_type* p)
         {
@@ -104,7 +104,7 @@ namespace agg
 
     //======================================================blender_device_n_pre
     template<class ColorT, class Order>
-    struct blender_cmyk_pre
+    struct blender_device_n_pre
     {
         typedef ColorT color_type;
         typedef Order order_type;
@@ -144,7 +144,7 @@ namespace agg
 
     //===================================================blender_device_n_gamma
     template<class ColorT, class Order, class Gamma,int N>
-    class blender_devuce_n_gamma
+    class blender_device_n_gamma
     {
     public:
         typedef ColorT color_type;
@@ -155,7 +155,7 @@ namespace agg
         enum base_scale_e { base_shift = color_type::base_shift };
 
         //--------------------------------------------------------------------
-        blender_cmyk_gamma() : m_gamma(0)
+        blender_device_n_gamma() : m_gamma(0)
         {
         }
 
@@ -251,7 +251,7 @@ namespace agg
 
     public:
         //--------------------------------------------------------------------
-        explicit pixfmt_alpha_blend_cmyk(rbuf_type& rb) :
+        explicit pixfmt_alpha_blend_device_n(rbuf_type& rb) :
             m_rbuf(&rb)
         {}
         void attach(rbuf_type& rb) { m_rbuf = &rb; }
@@ -830,7 +830,7 @@ namespace agg
     };
 
     //----pixfmt_device_n_32
-    typedef pixfmt_alpha_blend_cmyk<blender_cmyk<device_n_8<4>,  order_cmyk>, rendering_buffer>   pixfmt_cmyk32;
+    typedef pixfmt_alpha_blend_cmyk<blender_cmyk<device_n_8<4>,  order_cmyk>, rendering_buffer>   pixfmt_device_n_32;
 }
 
 #endif // AGG_PIXFMT_DEVICE_N_INCLUDED
