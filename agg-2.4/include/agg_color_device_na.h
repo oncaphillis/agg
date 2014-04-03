@@ -33,10 +33,14 @@ namespace agg
     // Supported byte orders for CMYK and CMYKA pixel formats
     //=======================================================================
     template<int N>
-    struct order_device_n   { enum cmyk_e  { C=0, M=1, Y=2, K=3, cmyk_tag, hasAlpha=false    }; }; // ---- order_cmyk
+    struct order_device_n   {
+        static int get(int i) {
+            return i;
+        }
+    };
 
-    template<int N>
-    struct order_devive_na  { enum cmyk_e  { C=0, M=1, Y=2, K=3, A=4, cmyk_tag,hasAlpha=true }; }; // ---- order_cmyka
+    // template<int N>
+    // struct order_devive_na  { enum cmyk_e  { C=0, M=1, Y=2, K=3, A=4, cmyk_tag,hasAlpha=true }; }; // ---- order_cmyka
     
     //====================================================================rgba
     template<int N>
@@ -46,18 +50,13 @@ namespace agg
         value_type _v[N];
 
         double _a; // alpha channel
-        
+
+        static const int num = N;
+
         //--------------------------------------------------------------------
         device_na()         {
         }
 
-        //--------------------------------------------------------------------
-#if 0
-        device_na(double c_, double m_, double y_, double k_,double a_=1.0) :           
-            c(c_), m(m_), y(y_), k(k_),a(a_)         {
-        }
-#endif
-   
         //--------------------------------------------------------------------
         template<int M>
         device_na(const device_na<M> & d, double a_=1.0) : _a(a_) {
@@ -73,7 +72,14 @@ namespace agg
                     _v[i]=0.0;
             }
         }
+
         const value_type  operator[](int idx) const {
+            if(idx>=N)
+                throw std::runtime_error("illegal index");
+            return _v[idx];
+        }
+
+        value_type  & operator[](int idx)  {
             if(idx>=N)
                 throw std::runtime_error("illegal index");
             return _v[idx];
@@ -81,6 +87,10 @@ namespace agg
 
         const value_type  alpha() const {
             return _a;
+        }
+
+        void alpha(value_type t) {
+            _a = t;
         }
 
         //--------------------------------------------------------------------
@@ -210,6 +220,8 @@ namespace agg
         typedef int8u  value_type;
         typedef int32u calc_type;
         typedef int32  long_type;
+        static const int num=N;
+
         enum base_scale_e
         {
             base_shift = 8,
@@ -485,11 +497,22 @@ namespace agg
             return _a;
         }
 
+        void alpha(value_type a) {
+            _a = a;
+        }
+
         const value_type & operator[](int idx) const {
             if(idx<0 || idx>=N)
                     throw std::runtime_error("illegal idx");
             return _v[idx];
         }
+
+        value_type & operator[](int idx) {
+            if(idx<0 || idx>=N)
+                    throw std::runtime_error("illegal idx");
+            return _v[idx];
+        }
+
         //--------------------------------------------------------------------
         static self_type no_color() { return self_type(); }
     };
