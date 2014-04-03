@@ -12,10 +12,10 @@ Changes for now
 
  * made some operators for   agg::trans_affine   const
 
- * added   [agg_color_cmyka]   and   [agg_pixfmt_cmyk]  Everything  we
+ * added  [[agg::color_cmyka]] and [[agg::pixfmt_cmyk]]  Everything  we
    need to paint in CMYK colorspace.
 
- * added   [add::gradient_biradial]  a  plugin  class for the gradient
+ * added  [[add::gradient_biradial]] a  plugin  class for the gradient
    calculation which supports the radial gradient filling as specified
    for PDF/Postscript
 
