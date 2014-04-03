@@ -153,6 +153,14 @@ namespace agg
             *this = from_wavelength(wavelen, gamma);
         }
 
+        const value_type & alpha() const {
+            return a;
+        }
+
+        void alpha(value_type a) {
+            this->a=a;
+        }
+
     };
 
     //----------------------------------------------------------------rgba_pre

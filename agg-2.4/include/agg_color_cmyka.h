@@ -164,6 +164,15 @@ namespace agg
             return cl;
         }
 
+        void alpha(value_type a)
+        {
+            this->a=a;
+        }
+
+        const value_type & alpha() const {
+            return a;
+        }
+
         //--------------------------------------------------------------------
         static cmyka no_color() { return cmyka(0,0,0,0,0); }
         
