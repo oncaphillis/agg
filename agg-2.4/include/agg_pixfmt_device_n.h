@@ -219,7 +219,7 @@ namespace agg
             base_shift = color_type::base_shift,
             base_scale = color_type::base_scale,
             base_mask  = color_type::base_mask,
-            pix_width  = sizeof(value_type) * 4
+            pix_width  = sizeof(value_type) * num
         };
 
     private:
@@ -407,7 +407,7 @@ namespace agg
                         {
                             p[order_type::get(i)] = c[i];
                         }
-                        p += color_type::num;
+                        p += num;
                     }
                     while(--len);
                 }
@@ -416,7 +416,7 @@ namespace agg
                     do
                     {
                         m_blender.blend_pix(p, to_unsigned_type(c), alpha, cover);
-                        p += 4;
+                        p += num;
                     }
                     while(--len);
                 }
@@ -576,7 +576,7 @@ namespace agg
                 do 
                 {
                     copy_or_blend_pix(p, *colors++, *covers++);
-                    p += 4;
+                    p += num;
                 }
                 while(--len);
             }
@@ -587,7 +587,7 @@ namespace agg
                     do 
                     {
                         copy_or_blend_pix(p, *colors++);
-                        p += 4;
+                        p += num;
                     }
                     while(--len);
                 }
@@ -596,7 +596,7 @@ namespace agg
                     do 
                     {
                         copy_or_blend_pix(p, *colors++, cover);
-                        p += 4;
+                        p += num;
                     }
                     while(--len);
                 }
@@ -781,14 +781,14 @@ namespace agg
             if(psrc)
             {
                 value_type* pdst = 
-                    (value_type*)m_rbuf->row_ptr(xdst, ydst, len) + xdst * 4;
+                    (value_type*)m_rbuf->row_ptr(xdst, ydst, len) + xdst * num;
                 do 
                 {
                     copy_or_blend_pix(pdst, 
                                       color, 
                                       (*psrc * cover + base_mask) >> base_shift);
                     ++psrc;
-                    pdst += 4;
+                    pdst += num;
                 }
                 while(--len);
             }
@@ -841,7 +841,7 @@ namespace agg
     };
 
     //----pixfmt_device_n_32
-    typedef pixfmt_alpha_blend_device_n<blender_device_n<device_na8<4>,  order_device_n<4> >, rendering_buffer>   pixfmt_device_n_32;
+    // typedef pixfmt_alpha_blend_device_n<blender_device_n<device_na8<4>,  order_device_n<4> >, rendering_buffer>   pixfmt_device_n_32;
 }
 
 
